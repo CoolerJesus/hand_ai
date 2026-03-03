@@ -3,3 +3,4 @@ mediapipe
 pandas
 scikit-learn
 pyttsx3
+Pillow
