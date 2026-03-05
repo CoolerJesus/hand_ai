@@ -1,18 +1,20 @@
-# 🖐️ AI Sign Language Translator
+# 🖐️ AI Sign Language Translator (Pro Version)
 
-This project is a machine learning-based tool that tracks hand gestures via webcam and translates them into text and spoken language. [cite_start]It uses **MediaPipe** for hand landmark extraction and a **Random Forest Classifier** for recognition.
+This is an advanced machine learning tool that translates sign language gestures into text and speech in real-time. It uses **MediaPipe** for hand tracking and a **Random Forest** model for gesture classification.
 
-## 🚀 Features
-* [cite_start]**Real-time Tracking**: Captures 21 hand landmarks in 3D space.
-* [cite_start]**Custom Dataset**: Record your own signs (e.g., "Hvala", "Bok") directly into a CSV file.
-* [cite_start]**Voice Feedback**: Uses `pyttsx3` to speak recognized signs aloud.
-* [cite_start]**Probability Filter**: High-confidence detection (80%+) ensures accuracy before speaking.
+## ✨ Key Features
+* **Two-Hand Support**: Recognizes complex signs using one or both hands.
+* **Coordinate Normalization**: AI understands the hand shape regardless of where you are in the camera frame.
+* **Temporal Smoothing**: Eliminates flickering by requiring a sign to be stable for 10 frames before translating.
+* **Sentence Builder**: Automatically strings words together to form full sentences.
+* **Voice Output**: Integrated Text-to-Speech (TTS) for accessibility.
+* **Interactive Quiz**: A game mode to test your knowledge of signs.
 
 ---
 
 ## 🛠️ Installation
 
-1. **Install Python** (3.8+ recommended).
-2. **Install dependencies**:
+1. **Install Python 3.8+**
+2. **Install Dependencies**:
    ```bash
    pip install -r requirements.txt
