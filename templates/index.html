@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Sign Language Translator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            color: #00d9ff;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        
+        .stats {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat-item {
+            padding: 10px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00d9ff, #00a8cc);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #1a1a2e;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffaa00, #ff8800);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4757, #ff3344);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .video-container img {
+            width: 100%;
+            display: block;
+        }
+        
+        .sentence-bar {
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            font-size: 1.1rem;
+            min-height: 50px;
+        }
+        
+        .labels-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .label-tag {
+            background: rgba(0,217,255,0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(0,217,255,0.3);
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            background: rgba(255,71,87,0.2);
+            border: 1px solid #ff4757;
+        }
+        
+        .alert-success {
+            background: rgba(0,255,136,0.2);
+            border-color: #00ff88;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .nav .btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status.on { background: #00ff88; }
+        .status.off { background: #ff4757; }
+        
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1.4rem; }
+            .btn { padding: 12px; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖐️ AI Sign Translator</h1>
+            <p>Works on Desktop & Mobile</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="samples">{{ stats.samples }}</div>
+                <div class="stat-label">Samples</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="signs">{{ stats.signs }}</div>
+                <div class="stat-label">Signs</div>
+            </div>
+        </div>
+        
+        {% if not has_model %}
+        <div class="alert">
+            ⚠️ <strong>No model trained yet!</strong><br>
+            <small>Step 1: Record signs → Step 2: Train AI → Step 3: Translate</small>
+        </div>
+        {% else %}
+        <div class="alert alert-success">
+            ✅ Model ready with {{ labels|length }} signs trained
+        </div>
+        {% endif %}
+        
+        <div class="nav">
+            <a href="/" class="btn btn-secondary">🏠 Home</a>
+            <a href="/collect" class="btn btn-primary">📹 Record</a>
+        </div>
+        
+        {% if has_model %}
+        <div class="card">
+            <h2 style="margin-bottom: 15px;">🔴 Live Detection</h2>
+            <div class="video-container">
+                <img src="{{ url_for('video') }}" id="video">
+                <div class="sentence-bar" id="sentence">Sentence: ...</div>
+            </div>
+            <button class="btn btn-danger" onclick="clearSentence()">🗑️ Clear Sentence</button>
+        </div>
+        {% endif %}
+        
+        <div class="card">
+            <h3 style="margin-bottom: 10px;">📚 Quick Start</h3>
+            <p style="color: #aaa; line-height: 1.6;">
+                <strong>1.</strong> Go to "Record" and record 50+ samples for each sign<br>
+                <strong>2.</strong> Click "Train AI" to create your model<br>
+                <strong>3.</strong> Come back here to translate in real-time!
+            </p>
+        </div>
+        
+        {% if labels %}
+        <div class="card">
+            <h3>🏷️ Trained Signs</h3>
+            <div class="labels-list">
+                {% for label in labels %}
+                <span class="label-tag">{{ label }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="card">
+            <h3>💡 Tips</h3>
+            <ul style="color: #aaa; padding-left: 20px; line-height: 1.8;">
+                <li>Keep hand visible in camera frame</li>
+                <li>Hold each sign steady for 1-2 seconds</li>
+                <li>Record at least 50 samples per sign</li>
+                <li>Use good lighting for best results</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        function clearSentence() {
+            fetch('/clear', { method: 'POST' })
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('sentence').textContent = 'Sentence: ...';
+                });
+        }
+        
+        function updateStats() {
+            fetch('/api/stats')
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('samples').textContent = d.samples;
+                    document.getElementById('signs').textContent = d.signs;
+                });
+        }
+        
+        setInterval(updateStats, 5000);
+    </script>
+</body>
+</html>

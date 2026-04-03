@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Record Signs - AI Sign Translator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            color: #00d9ff;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00d9ff, #00a8cc);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #1a1a2e;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffaa00, #ff8800);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .preview {
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .preview img {
+            width: 100%;
+            display: block;
+        }
+        
+        .progress {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .message.success {
+            background: rgba(0,255,136,0.2);
+            border: 1px solid #00ff88;
+            display: block;
+        }
+        
+        .message.error {
+            background: rgba(255,71,87,0.2);
+            border: 1px solid #ff4757;
+            display: block;
+        }
+        
+        .signs-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .sign-chip {
+            background: rgba(255,170,0,0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,170,0,0.3);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-recording {
+            background: #ff4757;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .instructions {
+            background: rgba(0,217,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .instructions h4 {
+            color: #00d9ff;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            color: #aaa;
+            padding-left: 20px;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📹 Record New Sign</h1>
+        </div>
+        
+        <a href="/" class="btn btn-secondary">← Back to Home</a>
+        
+        <div class="card">
+            <div class="form-group">
+                <label>Sign Name (e.g., "Hello", "Thank You")</label>
+                <input type="text" id="signName" placeholder="Enter sign name...">
+            </div>
+            
+            <div class="form-group">
+                <label>Samples to Record</label>
+                <input type="number" id="sampleCount" value="50" min="20" max="200">
+            </div>
+            
+            <button class="btn btn-primary" id="recordBtn" onclick="startRecording()">
+                ▶️ Start Recording
+            </button>
+        </div>
+        
+        <div class="card">
+            <h3><span class="status-indicator" id="statusIndicator"></span>Recording Status</h3>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <p style="color: #aaa; text-align: center;" id="statusText">Ready to record</p>
+        </div>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="instructions">
+            <h4>📋 Instructions</h4>
+            <ul>
+                <li>Hold the sign clearly in front of camera</li>
+                <li>Keep your hand steady for best results</li>
+                <li>Recording starts automatically</li>
+                <li>50-100 samples recommended per sign</li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h3>Existing Signs</h3>
+            <div class="signs-list" id="signsList">
+                <span style="color: #888;">No signs recorded yet</span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <button class="btn btn-success" onclick="trainModel()">🧠 Train AI Model</button>
+            <button class="btn btn-warning" onclick="location.href='/'">🎯 Start Detection</button>
+        </div>
+    </div>
+    
+    <script>
+        let isRecording = false;
+        
+        function updateSignsList() {
+            fetch('/api/stats')
+                .then(r => r.json())
+                .then(d => {
+                    const list = document.getElementById('signsList');
+                    if (d.details && Object.keys(d.details).length > 0) {
+                        list.innerHTML = Object.keys(d.details)
+                            .map(s => `<span class="sign-chip">${s} (${d.details[s]})</span>`)
+                            .join('');
+                    }
+                });
+        }
+        
+        function startRecording() {
+            const name = document.getElementById('signName').value.trim();
+            const count = parseInt(document.getElementById('sampleCount').value);
+            
+            if (!name) {
+                showMessage('Please enter a sign name', 'error');
+                return;
+            }
+            
+            document.getElementById('recordBtn').disabled = true;
+            document.getElementById('statusIndicator').className = 'status-indicator status-recording';
+            document.getElementById('statusText').textContent = `Recording "${name}"...`;
+            isRecording = true;
+            
+            const formData = new FormData();
+            formData.append('sign_name', name);
+            
+            fetch('/record', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(d => {
+                isRecording = false;
+                document.getElementById('recordBtn').disabled = false;
+                document.getElementById('statusIndicator').className = 'status-indicator';
+                document.getElementById('statusText').textContent = 'Recording complete!';
+                document.getElementById('progressBar').style.width = '100%';
+                document.getElementById('progressBar').textContent = '100%';
+                
+                if (d.success) {
+                    showMessage(d.message, 'success');
+                    updateSignsList();
+                } else {
+                    showMessage(d.error || 'Recording failed', 'error');
+                }
+            })
+            .catch(e => {
+                isRecording = false;
+                document.getElementById('recordBtn').disabled = false;
+                document.getElementById('statusText').textContent = 'Error occurred';
+                showMessage('Error: ' + e, 'error');
+            });
+        }
+        
+        function trainModel() {
+            if (!confirm('Train AI model with current data?')) return;
+            
+            document.getElementById('statusText').textContent = 'Training model...';
+            
+            fetch('/train', { method: 'POST' })
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) {
+                        showMessage(`Model trained! Accuracy: ${d.accuracy}`, 'success');
+                        setTimeout(() => location.href = '/', 1500);
+                    } else {
+                        showMessage(d.error || 'Training failed', 'error');
+                    }
+                })
+                .catch(e => showMessage('Error: ' + e, 'error'));
+        }
+        
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+        }
+        
+        updateSignsList();
+    </script>
+</body>
+</html>

@@ -1,6 +1,8 @@
-opencv-python
-mediapipe
-pandas
-scikit-learn
-pyttsx3
-Pillow
+flask>=2.0.0
+opencv-python>=4.5.0
+mediapipe>=0.8.0
+numpy>=1.20.0
+pandas>=1.3.0
+scikit-learn>=1.0.0
+pyttsx3>=2.90
+Pillow>=8.0.0
